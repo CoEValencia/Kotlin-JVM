@@ -91,7 +91,6 @@ object Main {
             CreateFrame().centerDesktopDefault()
         }
         println("2")
-
     }
 
     fun CreateFrame() = JFrame("Frame").apply {
@@ -103,45 +102,45 @@ object Main {
 
     fun JPanCreate() = JPanel().apply{
         this.layout = FlowLayout()
-        this.add(JLbCreate())
+        this.add(JLabel("Label"))
         this.add(JBtnCreate())
     }
-
-    fun JLbCreate() = JLabel("Label")
 
     fun JBtnCreate() = JButton().apply {
             this.text = "Close"
             this.addActionListener { System.exit(0) }
         }
 
-    fun JFrame.centerDesktopDefault() = this.centerDesktop(0)
+    fun JFrame.centerDesktopDefault() = this.centerDesktop(-1)
 
-    fun JFrame.centerDesktop(num : Int) {
-        this.location = Point(0, 0)
+    fun JFrame.centerDesktop(num : Int){
+        this.location = Point().centerDektop(this,num)
+    }
+
+    fun Point.centerDektop(component: Component, numDesktop: Int) : Point {
         try {
             val mousePoint = MouseInfo.getPointerInfo().location
             val devices = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
             for ((index, device) in devices.withIndex()) {
-                if( num!= index && num !=-1)
-                    return
+                if( numDesktop!= index && numDesktop !=-1)
+                    return Point(0,0)
 
                 val bounds = device.defaultConfiguration.bounds
                 if (   mousePoint.x >= bounds.x &&
-                       mousePoint.y >= bounds.y &&
-                       mousePoint.x <= bounds.x + bounds.width &&
-                       mousePoint.y <= bounds.y + bounds.height) {
+                        mousePoint.y >= bounds.y &&
+                        mousePoint.x <= bounds.x + bounds.width &&
+                        mousePoint.y <= bounds.y + bounds.height) {
 
-                    this.location = Point(
-                            (bounds.width - this.width) / 2 + bounds.x,
-                            (bounds.height - this.height) / 2 + bounds.y
+                    return Point(
+                            (bounds.width - component.width) / 2 + bounds.x,
+                            (bounds.height - component.height) / 2 + bounds.y
                     )
-
-                    return
                 }
             }
         } catch (e: Exception) {
             println("Error!!!!! " + e.message)
         }
+        return Point(0,0)
     }
 }
 ```

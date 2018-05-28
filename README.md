@@ -1,4 +1,4 @@
-# Kotlin JVM   (WIP) - Migration Code
+# Kotlin JVM - Migration Code
 
 ### From Java to Kotlin
 
@@ -79,7 +79,71 @@ public class Main {
 ```
 ##### kotlin
 ```kotlin
+object Main {
 
+    @JvmStatic
+    fun main(args: Array<String>) = invokeLater()
+
+    private fun invokeLater() {
+        println("0")
+        SwingUtilities.invokeLater {
+            println("1")
+            CreateFrame().centerDesktopDefault()
+        }
+        println("2")
+
+    }
+
+    fun CreateFrame() = JFrame("Frame").apply {
+        this.add(JPanCreate())
+        this.setSize(200, 300)
+        this.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        this.isVisible = true
+    }
+
+    fun JPanCreate() = JPanel().apply{
+        this.layout = FlowLayout()
+        this.add(JLbCreate())
+        this.add(JBtnCreate())
+    }
+
+    fun JLbCreate() = JLabel("Label")
+
+    fun JBtnCreate() = JButton().apply {
+            this.text = "Close"
+            this.addActionListener { System.exit(0) }
+        }
+
+    fun JFrame.centerDesktopDefault() = this.centerDesktop(0)
+
+    fun JFrame.centerDesktop(num : Int) {
+        this.location = Point(0, 0)
+        try {
+            val mousePoint = MouseInfo.getPointerInfo().location
+            val devices = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
+            for ((index, device) in devices.withIndex()) {
+                if( num!= index && num !=-1)
+                    return
+
+                val bounds = device.defaultConfiguration.bounds
+                if (   mousePoint.x >= bounds.x &&
+                       mousePoint.y >= bounds.y &&
+                       mousePoint.x <= bounds.x + bounds.width &&
+                       mousePoint.y <= bounds.y + bounds.height) {
+
+                    this.location = Point(
+                            (bounds.width - this.width) / 2 + bounds.x,
+                            (bounds.height - this.height) / 2 + bounds.y
+                    )
+
+                    return
+                }
+            }
+        } catch (e: Exception) {
+            println("Error!!!!! " + e.message)
+        }
+    }
+}
 ```
 
 

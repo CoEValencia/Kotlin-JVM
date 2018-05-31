@@ -7,9 +7,7 @@
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("0");
         invokeLater();
-        System.out.println("2");
     }
 
     private static void invokeLater() {
@@ -82,51 +80,39 @@ public class Main {
 object Main {
 
     @JvmStatic
-    fun main(args: Array<String>) = invokeLater()
-
-    private fun invokeLater() {
-        println("0")
-        SwingUtilities.invokeLater {
-            println("1")
-            CreateFrame().centerDesktopDefault()
+    fun main(args: Array<String>) = launch {
+            CreateFrame().apply{
+                location = Point().let { it.centerDesktop(this,-1) }
+            }
         }
-        println("2")
-    }
 
     fun CreateFrame() = JFrame("Frame").apply {
-        this.add(JPanCreate())
+        this.add(
+                JPanel().apply{
+                    this.layout = FlowLayout()
+                    this.add(JLabel("Label"))
+                    this.add(
+                            JButton().apply {
+                                this.text = "Close"
+                                this.addActionListener { System.exit(0) }
+                            })
+                })
         this.setSize(200, 300)
         this.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         this.isVisible = true
     }
-
-    fun JPanCreate() = JPanel().apply{
-        this.layout = FlowLayout()
-        this.add(JLabel("Label"))
-        this.add(JBtnCreate())
-    }
-
-    fun JBtnCreate() = JButton().apply {
-            this.text = "Close"
-            this.addActionListener { System.exit(0) }
-        }
-
-    fun JFrame.centerDesktopDefault() = this.centerDesktop(-1)
-
-    fun JFrame.centerDesktop(num : Int){
-        this.location = Point().centerDektop(this,num)
-    }
-
-    fun Point.centerDektop(component: Component, numDesktop: Int) : Point {
+    
+    fun Point.centerDesktop(component: Component, numDesktop: Int) : Point {
+        val pZero = Point(0,0)
         try {
-            val mousePoint = MouseInfo.getPointerInfo().location
             val devices = GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
             for ((index, device) in devices.withIndex()) {
                 if( numDesktop!= index && numDesktop !=-1)
-                    return Point(0,0)
+                    return pZero
 
+                val mousePoint = MouseInfo.getPointerInfo().location
                 val bounds = device.defaultConfiguration.bounds
-                if (   mousePoint.x >= bounds.x &&
+                if (    mousePoint.x >= bounds.x &&
                         mousePoint.y >= bounds.y &&
                         mousePoint.x <= bounds.x + bounds.width &&
                         mousePoint.y <= bounds.y + bounds.height) {
@@ -140,7 +126,7 @@ object Main {
         } catch (e: Exception) {
             println("Error!!!!! " + e.message)
         }
-        return Point(0,0)
+        return pZero
     }
 }
 ```
